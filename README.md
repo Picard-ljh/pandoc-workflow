@@ -310,7 +310,7 @@ pandoc article.md --defaults=elegantnote --lua-filter=callout2latex -s -t latex 
 
 ---
 
-## 你和朋友的典型用法
+## 典型用法
 
 ### 场景 1：你有论文 PDF，要做答辩 PPT
 
