@@ -274,7 +274,7 @@ pandoc article.md --defaults=elegantnote --lua-filter=callout2latex -s -t latex 
 
 ---
 
-## 整体原理（用人话讲）
+## 整体原理
 
 ```
 你的 Markdown 文件 (.md)
