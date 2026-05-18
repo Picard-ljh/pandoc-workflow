@@ -1,12 +1,11 @@
 pdf-engine: xelatex
 to: beamer
-include-in-header:
-  - __PANDOC_DIR__/defaults/beamer-color.tex
 metadata:
-  theme: Berlin
+  theme: Madrid
+  colortheme: whale
   fontsize: 11pt
-  CJKmainfont: __CJK_MAIN__
-  CJKsansfont: __CJK_SANS__
-  CJKmonofont: __CJK_SANS__
+  CJKmainfont: SimSun
+  CJKsansfont: SimHei
+  CJKmonofont: SimHei
 variables:
   aspectratio: "169"

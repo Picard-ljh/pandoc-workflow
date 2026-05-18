@@ -87,8 +87,11 @@ apply_template "pandoc/defaults/beamer-metropolis.yaml" "${PANDOC_DIR}/defaults/
 # These have no placeholders, copy directly
 cp "pandoc/defaults/elegantnote-env.tex"  "${PANDOC_DIR}/defaults/elegantnote-env.tex"
 cp "pandoc/defaults/beamer-color.tex"            "${PANDOC_DIR}/defaults/beamer-color.tex"
-cp "pandoc/defaults/beamer-exercise.yaml"      "${PANDOC_DIR}/defaults/beamer-exercise.yaml"
-cp "pandoc/defaults/beamer-exercise-style.tex" "${PANDOC_DIR}/defaults/beamer-exercise-style.tex"
+cp "pandoc/defaults/beamer-berlin.yaml"           "${PANDOC_DIR}/defaults/beamer-berlin.yaml"
+cp "pandoc/defaults/beamer-exercise.yaml"         "${PANDOC_DIR}/defaults/beamer-exercise.yaml"
+cp "pandoc/defaults/beamer-berlin-exercise.yaml"  "${PANDOC_DIR}/defaults/beamer-berlin-exercise.yaml"
+cp "pandoc/defaults/beamer-metropolis-exercise.yaml" "${PANDOC_DIR}/defaults/beamer-metropolis-exercise.yaml"
+cp "pandoc/defaults/beamer-exercise-style.tex"   "${PANDOC_DIR}/defaults/beamer-exercise-style.tex"
 
 # --- Copy filters ---
 echo "[*] Installing Lua filters..."
@@ -109,11 +112,11 @@ CLAUDE_SNIPPET=$(cat <<'SNIPPET'
 
 - **文章 PDF**：`bash ~/.claude/scripts/md2pdf.sh <file.md>`
   排版引擎：ElegantNote + XeLaTeX，pad 尺寸，中文支持，内置 callout2latex
-- **幻灯片 PDF**：`bash ~/.claude/scripts/md2slides.sh <file.md> [--defaults=beamer-metropolis]`
-  排版引擎：Beamer + XeLaTeX，16:9。默认 Berlin 深蓝，可选 metropolis 极简
-  生成 PPT 前**必须询问用户**选用哪种风格
+- **幻灯片 PDF**：`bash ~/.claude/scripts/md2slides.sh <file.md> [--defaults=beamer-berlin|beamer-metropolis]`
+  排版引擎：Beamer + XeLaTeX，16:9，whale 标准配色。默认 Madrid，可选 Berlin/metropolis
+  生成 PPT 前**必须询问用户**选用哪种主题
 - **习题课 / 纯题目展示**：`bash ~/.claude/scripts/md2slides.sh <file.md> --defaults=beamer-exercise`
-  8pt 小字 + 无标题栏 + 左上角紧贴 + 段距收紧，每页一道题留白演算
+  排版引擎：Beamer + Madrid，8pt 小字 + 无标题栏 + 左上角紧贴。可选 beamer-berlin-exercise 或 beamer-metropolis-exercise
 SNIPPET
 )
 
