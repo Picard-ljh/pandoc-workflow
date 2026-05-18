@@ -1,0 +1,15 @@
+pdf-engine: xelatex
+to: beamer
+include-in-header:
+  - C:/Users/22972/AppData/Roaming/pandoc/defaults/beamer-color.tex
+  - C:/Users/22972/AppData/Roaming/pandoc/defaults/beamer-exercise-style.tex
+metadata:
+  theme: Berlin
+  fontsize: 8pt
+  CJKmainfont: SimSun
+  CJKsansfont: SimHei
+  CJKmonofont: SimHei
+  classoption:
+    - t
+variables:
+  aspectratio: "169"

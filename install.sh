@@ -86,7 +86,9 @@ apply_template "pandoc/defaults/beamer.yaml"         "${PANDOC_DIR}/defaults/bea
 apply_template "pandoc/defaults/beamer-metropolis.yaml" "${PANDOC_DIR}/defaults/beamer-metropolis.yaml"
 # These have no placeholders, copy directly
 cp "pandoc/defaults/elegantnote-env.tex"  "${PANDOC_DIR}/defaults/elegantnote-env.tex"
-cp "pandoc/defaults/beamer-color.tex"     "${PANDOC_DIR}/defaults/beamer-color.tex"
+cp "pandoc/defaults/beamer-color.tex"            "${PANDOC_DIR}/defaults/beamer-color.tex"
+cp "pandoc/defaults/beamer-exercise.yaml"      "${PANDOC_DIR}/defaults/beamer-exercise.yaml"
+cp "pandoc/defaults/beamer-exercise-style.tex" "${PANDOC_DIR}/defaults/beamer-exercise-style.tex"
 
 # --- Copy filters ---
 echo "[*] Installing Lua filters..."
@@ -110,6 +112,8 @@ CLAUDE_SNIPPET=$(cat <<'SNIPPET'
 - **幻灯片 PDF**：`bash ~/.claude/scripts/md2slides.sh <file.md> [--defaults=beamer-metropolis]`
   排版引擎：Beamer + XeLaTeX，16:9。默认 Berlin 深蓝，可选 metropolis 极简
   生成 PPT 前**必须询问用户**选用哪种风格
+- **习题课 / 纯题目展示**：`bash ~/.claude/scripts/md2slides.sh <file.md> --defaults=beamer-exercise`
+  8pt 小字 + 无标题栏 + 左上角紧贴 + 段距收紧，每页一道题留白演算
 SNIPPET
 )
 
