@@ -1,0 +1,9 @@
+pdf-engine: xelatex
+metadata:
+  documentclass: elegantnote
+  classoption:
+    - cn
+    - 11pt
+    - pad
+include-in-header:
+  - __PANDOC_DIR__/defaults/elegantnote-env.tex
