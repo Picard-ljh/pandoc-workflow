@@ -202,6 +202,8 @@ bash ~/.claude/scripts/md2slides.sh talk.md --defaults=beamer-berlin
 bash ~/.claude/scripts/md2slides.sh talk.md --defaults=beamer-metropolis
 ```
 
+> **配色说明**：Madrid 和 metropolis 使用各自内置的标准配色。Berlin 额外引用 `beamer-color.tex`（自定义深蓝 navyblue #003366），这是有意为之——Berlin 的深蓝顶条与 Madrid 的 whale 蓝属于不同色调。如果你希望所有主题视觉统一，将 `beamer-berlin.yaml` 中的 `beamer-color.tex` 引用删除即可还原为 whale 标准蓝。
+
 ### 习题课 / 纯题目展示
 
 专用排版预设，8pt 小字 + 无标题栏 + 左上角紧贴 + 段距收紧，每页一道题留白充足：
