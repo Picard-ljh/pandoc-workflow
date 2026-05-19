@@ -403,7 +403,8 @@ pandoc-workflow/
 │   │   ├── beamer-berlin-exercise.yaml ← Berlin + 习题排版
 │   │   ├── beamer-metropolis-exercise.yaml ← metropolis + 习题排版
 │   │   ├── beamer-color.tex           ← Berlin 自定义深蓝配色
-│   │   └── beamer-exercise-style.tex  ← 习题排版样式（小字 + 紧贴）
+│   │   ├── beamer-exercise-style.tex  ← 习题排版样式（小字 + 紧贴）
+│   │   └── beamer-footline.tex        ← Madrid 精简页脚（N/M 页码）
 │   └── filters/
 │       ├── callout2latex.lua          ← 文章线提示框转换
 │       ├── callout2beamer.lua         ← 幻灯片线提示框转换

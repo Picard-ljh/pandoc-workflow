@@ -6,8 +6,8 @@ metadata:
   theme: Berlin
   colortheme: whale
   fontsize: 11pt
-  CJKmainfont: SimSun
-  CJKsansfont: SimHei
-  CJKmonofont: SimHei
+  CJKmainfont: __CJK_MAIN__
+  CJKsansfont: __CJK_SANS__
+  CJKmonofont: __CJK_SANS__
 variables:
   aspectratio: "169"

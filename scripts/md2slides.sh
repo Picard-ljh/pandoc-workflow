@@ -26,7 +26,7 @@ fi
 output="${input%.*}.pdf"
 texfile="${input%.*}.tex"
 
-PANDOC_DATA_DIR="C:/Users/22972/AppData/Roaming/pandoc"
+PANDOC_DATA_DIR="__PANDOC_DIR__"
 
 # Scan extra args for --defaults= override; use Madrid by default
 DEFAULTS="beamer"

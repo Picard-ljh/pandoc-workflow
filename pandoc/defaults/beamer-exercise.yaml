@@ -6,9 +6,9 @@ metadata:
   theme: Madrid
   colortheme: whale
   fontsize: 8pt
-  CJKmainfont: SimSun
-  CJKsansfont: SimHei
-  CJKmonofont: SimHei
+  CJKmainfont: __CJK_MAIN__
+  CJKsansfont: __CJK_SANS__
+  CJKmonofont: __CJK_SANS__
   classoption:
     - t
 variables:
