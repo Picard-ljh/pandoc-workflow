@@ -104,7 +104,7 @@ xelatex -interaction=nonstopmode "$texfile" > /dev/null || {
 }
 
 # Second pass for TOC / cross-references (failure is non-fatal)
-xelatex -interaction=nonstopmode "$texfile" > /dev/null 2>&1 || true
+xelatex -interaction=nonstopmode "$texfile" > /dev/null || true
 
 # Verify PDF was actually generated
 if [ ! -f "${BASE%.*}.pdf" ]; then
