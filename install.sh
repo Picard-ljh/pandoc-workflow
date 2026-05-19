@@ -92,6 +92,7 @@ apply_template "pandoc/defaults/beamer-exercise.yaml"         "${PANDOC_DIR}/def
 apply_template "pandoc/defaults/beamer-berlin-exercise.yaml"  "${PANDOC_DIR}/defaults/beamer-berlin-exercise.yaml"
 apply_template "pandoc/defaults/beamer-metropolis-exercise.yaml" "${PANDOC_DIR}/defaults/beamer-metropolis-exercise.yaml"
 cp "pandoc/defaults/beamer-exercise-style.tex"   "${PANDOC_DIR}/defaults/beamer-exercise-style.tex"
+cp "pandoc/defaults/beamer-footline.tex"         "${PANDOC_DIR}/defaults/beamer-footline.tex"
 
 # --- Copy filters ---
 echo "[*] Installing Lua filters..."
