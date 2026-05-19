@@ -27,7 +27,7 @@ output="${input%.*}.pdf"
 
 PANDOC_DATA_DIR="C:/Users/22972/AppData/Roaming/pandoc"
 
-# Scan extra args for --defaults= override; use Berlin by default
+# Scan extra args for --defaults= override; use Madrid by default
 DEFAULTS="beamer"
 EXTRA=()
 for arg in "$@"; do
@@ -38,8 +38,14 @@ for arg in "$@"; do
   fi
 done
 
-pandoc "$input" \
+# Preprocess: escape ___ so Pandoc treats as literal underscores,
+# then blanks.lua converts them to \underline{\hspace{3cm}}.
+cd "$(dirname "$input")"
+BASE=$(basename "$input")
+sed 's/___/\\\\_\\\\_\\\\_/g' "$BASE" \
+  | pandoc -f markdown \
   --defaults="$DEFAULTS" \
+  --lua-filter="$PANDOC_DATA_DIR/filters/blanks.lua" \
   --lua-filter="$PANDOC_DATA_DIR/filters/callout2beamer.lua" \
   -o "$output" \
   "${EXTRA[@]}"
