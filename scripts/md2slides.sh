@@ -44,6 +44,7 @@ cd "$(dirname "$input")"
 BASE=$(basename "$input")
 sed 's/___/\\\\_\\\\_\\\\_/g' "$BASE" \
   | pandoc -f markdown \
+  --resource-path=. \
   --defaults="$DEFAULTS" \
   --lua-filter="$PANDOC_DATA_DIR/filters/blanks.lua" \
   --lua-filter="$PANDOC_DATA_DIR/filters/callout2beamer.lua" \
