@@ -97,6 +97,7 @@ cp "pandoc/defaults/beamer-exercise-style.tex"   "${PANDOC_DIR}/defaults/beamer-
 echo "[*] Installing Lua filters..."
 cp "pandoc/filters/callout2latex.lua"  "${PANDOC_DIR}/filters/callout2latex.lua"
 cp "pandoc/filters/callout2beamer.lua" "${PANDOC_DIR}/filters/callout2beamer.lua"
+cp "pandoc/filters/blanks.lua"         "${PANDOC_DIR}/filters/blanks.lua"
 
 # --- Copy scripts ---
 echo "[*] Installing scripts..."
