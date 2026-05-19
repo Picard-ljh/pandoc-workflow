@@ -171,30 +171,53 @@ bash ~/.claude/scripts/md2slides.sh 我的答辩.md
 
 ---
 
-### 两种幻灯片风格
+### 三种幻灯片主题
 
-本工作流内置两种 Beamer 风格。Claude Code 会在做 PPT 前问你选哪个：
+本工作流内置三种 Beamer 主题，全部使用 whale 标准配色。Claude Code 会在做 PPT 前问你选哪个：
 
-**Berlin 深蓝（默认）**
-- 深蓝色顶部横条 + 底部页脚
+**Madrid（默认）**
+- 顶部导航条 + 底部信息栏
 - 页脚显示：作者 | 论文题目 | 日期 | 页码
-- 蓝色项目符号
-- 经典学术风格，适合答辩
+- 经典学术风，适合答辩和正式报告
+
+**Berlin**
+- 顶部横条 + 底部页脚
+- 与 Madrid 同属 infolines 家族，章节导航更突出
+- 适合结构比较复杂的演讲
 
 **metropolis 极简**
 - 无横条，仅细线
 - 仅页码，无信息栏
-- 灰色三角项目符号
-- 现代极简风格，适合技术分享
+- 现代极简风，适合技术分享
 
 切换方法：
 ```bash
-# 默认是 Berlin 深蓝，不需要加任何参数
+# 默认 Madrid，不需要加任何参数
 bash ~/.claude/scripts/md2slides.sh talk.md
 
-# 切换到 metropolis 极简
+# Berlin
+bash ~/.claude/scripts/md2slides.sh talk.md --defaults=beamer-berlin
+
+# metropolis 极简
 bash ~/.claude/scripts/md2slides.sh talk.md --defaults=beamer-metropolis
 ```
+
+### 习题课 / 纯题目展示
+
+专用排版预设，8pt 小字 + 无标题栏 + 左上角紧贴 + 段距收紧，每页一道题留白充足：
+
+```bash
+# Madrid + 习题排版
+bash ~/.claude/scripts/md2slides.sh problems.md --defaults=beamer-exercise
+
+# Berlin + 习题排版
+bash ~/.claude/scripts/md2slides.sh problems.md --defaults=beamer-berlin-exercise
+
+# metropolis + 习题排版
+bash ~/.claude/scripts/md2slides.sh problems.md --defaults=beamer-metropolis-exercise
+```
+
+> **写作规范**：习题课模式下，`#` 后只写题号（如 `# 题1`），题干内容另起一行放在 `#` 下方。因为该模式隐藏了标题栏，`#` 行内容不可见。
 
 ---
 
@@ -314,21 +337,27 @@ pandoc article.md --defaults=elegantnote --lua-filter=callout2latex -s -t latex 
 
 ### 场景 1：你有论文 PDF，要做答辩 PPT
 
-> "帮我把桌面的论文.pdf 做成答辩 PPT，Berlin 深蓝风格"
+> "帮我把桌面的论文.pdf 做成答辩 PPT"
 
-Claude Code 会：读论文 → 提取内容 → 写 Markdown → 编译幻灯片 PDF
+Claude Code 会：读论文 → 提取内容 → 询问你用 Madrid/Berlin/metropolis → 写 Markdown → 编译
 
-### 场景 2：你想写一篇博客，顺便出个 PDF 版
+### 场景 2：你有一堆题目，要做成习题课 PPT
+
+> "把题.txt 做成习题课 PPT，Madrid 主题"
+
+Claude Code 会：解析题目 → 每页一道题 → `--defaults=beamer-exercise` → 出 PDF
+
+### 场景 3：你想写博客，顺便出个 PDF 版
 
 > "帮我写一篇关于 XXX 的文章，转成 PDF"
 
-Claude Code 会：写 Markdown → 编译文章 PDF
+Claude Code 会：写 Markdown → `md2pdf.sh` → 出 PDF
 
-### 场景 3：你已经有 Markdown，想重新编译
+### 场景 4：重新编译已有的 Markdown
 
 > "答辩PPT.md 重新编译一下"
 
-Claude Code 会：跑 md2slides.sh → 出 PDF
+Claude Code 会：跑 `md2slides.sh` → 出 PDF
 
 ---
 
@@ -360,22 +389,28 @@ Claude Code 会：跑 md2slides.sh → 出 PDF
 
 ```
 pandoc-workflow/
-├── README.md                       ← 你正在看的这份文档
-├── install.sh                      ← 一键安装脚本
+├── README.md                          ← 你正在看的这份文档
+├── install.sh                         ← 一键安装脚本
 ├── .gitignore
 ├── pandoc/
 │   ├── defaults/
-│   │   ├── elegantnote.yaml        ← 文章线默认参数
-│   │   ├── elegantnote-env.tex     ← 文章线提示框环境定义
-│   │   ├── beamer.yaml             ← 幻灯片线默认参数（Berlin 深蓝）
-│   │   ├── beamer-metropolis.yaml  ← 幻灯片线参数（metropolis 极简）
-│   │   └── beamer-color.tex        ← 深蓝配色方案
+│   │   ├── elegantnote.yaml           ← 文章线默认参数
+│   │   ├── elegantnote-env.tex        ← 文章线提示框环境定义（16 种）
+│   │   ├── beamer.yaml                ← 幻灯片线默认参数（Madrid + whale）
+│   │   ├── beamer-berlin.yaml         ← Berlin + whale
+│   │   ├── beamer-metropolis.yaml     ← metropolis + metropolis
+│   │   ├── beamer-exercise.yaml       ← Madrid + 习题排版
+│   │   ├── beamer-berlin-exercise.yaml ← Berlin + 习题排版
+│   │   ├── beamer-metropolis-exercise.yaml ← metropolis + 习题排版
+│   │   ├── beamer-color.tex           ← Berlin 自定义深蓝配色
+│   │   └── beamer-exercise-style.tex  ← 习题排版样式（小字 + 紧贴）
 │   └── filters/
-│       ├── callout2latex.lua       ← 文章线提示框转换过滤器
-│       └── callout2beamer.lua      ← 幻灯片线提示框转换过滤器
+│       ├── callout2latex.lua          ← 文章线提示框转换
+│       ├── callout2beamer.lua         ← 幻灯片线提示框转换
+│       └── blanks.lua                 ← 填空横线转换（___ → 下划线）
 └── scripts/
-    ├── md2pdf.sh                   ← 一键出文章 PDF
-    └── md2slides.sh                ← 一键出幻灯片 PDF
+    ├── md2pdf.sh                      ← 一键出文章 PDF
+    └── md2slides.sh                   ← 一键出幻灯片 PDF
 ```
 
 ---
