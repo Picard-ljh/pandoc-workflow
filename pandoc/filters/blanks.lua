@@ -10,8 +10,12 @@ function Str(elem)
   local parts = pandoc.List()
   local pos = 1
   while true do
-    local s, e = text:find('___', pos, true)
+    local s, e = text:find('___+', pos)
     if not s then break end
+    -- extend to consume all consecutive underscores
+    while e < #text and text:sub(e + 1, e + 1) == '_' do
+      e = e + 1
+    end
     if s > pos then
       parts:insert(pandoc.Str(text:sub(pos, s - 1)))
     end
