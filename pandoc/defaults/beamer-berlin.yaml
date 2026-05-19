@@ -1,7 +1,7 @@
 pdf-engine: xelatex
 to: beamer
 include-in-header:
-  - C:/Users/22972/AppData/Roaming/pandoc/defaults/beamer-color.tex
+  - __PANDOC_DIR__/defaults/beamer-color.tex
 metadata:
   theme: Berlin
   colortheme: whale
