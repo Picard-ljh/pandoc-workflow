@@ -108,17 +108,48 @@ chmod +x "${SCRIPTS_DIR}/md2pdf.sh" "${SCRIPTS_DIR}/md2slides.sh"
 
 # --- Print CLAUDE.md snippet ---
 CLAUDE_SNIPPET=$(cat <<'SNIPPET'
-### Markdown → PDF / PPT
+## PPT 制作
 
-当用户要求 Markdown 转 PDF 或做学术答辩 PPT 时：
+当用户要求做 PPT 时，使用脚本：
 
-- **文章 PDF**：`bash ~/.claude/scripts/md2pdf.sh <file.md>`
-  排版引擎：ElegantNote + XeLaTeX，pad 尺寸，中文支持，内置 callout2latex
-- **幻灯片 PDF**：`bash ~/.claude/scripts/md2slides.sh <file.md> [--defaults=beamer-berlin|beamer-metropolis]`
-  排版引擎：Beamer + XeLaTeX，16:9，whale 标准配色。默认 Madrid，可选 Berlin/metropolis
-  生成 PPT 前**必须询问用户**选用哪种主题
-- **习题课 / 纯题目展示**：`bash ~/.claude/scripts/md2slides.sh <file.md> --defaults=beamer-exercise`
-  排版引擎：Beamer + Madrid，8pt 小字 + 无标题栏 + 左上角紧贴。可选 beamer-berlin-exercise 或 beamer-metropolis-exercise
+```bash
+bash ~/.claude/scripts/md2slides.sh "<Markdown文件路径>" [额外 pandoc 参数]
+```
+
+排版引擎：Beamer + XeLaTeX，16:9 横屏，whale 标准配色。中文：SimSun + SimHei。
+
+**三种场景与对应命令**：
+
+| 场景 | 额外参数 | 说明 |
+|------|---------|------|
+| 学术答辩 / 日常汇报 / 教学课件 | `--defaults=beamer-{theme}` | 标准 Beamer，正常字号 |
+| 习题课 / 纯题目展示 | `--defaults=beamer-{theme}-exercise` | 8pt 小字，无标题栏，紧凑排版 |
+
+**三种主题**（生成前**必须询问用户**选择，默认 Madrid）：
+
+| 主题 | `{theme}` 值 | 风格 |
+|------|-------------|------|
+| Madrid（默认） | `beamer` 或 `beamer-exercise` | 顶部导航条 + 底部信息栏，经典学术风 |
+| Berlin | `beamer-berlin` 或 `beamer-berlin-exercise` | 顶部横条 + 底部页脚 |
+| metropolis 极简 | `beamer-metropolis` 或 `beamer-metropolis-exercise` | 无横条，仅细线分隔 |
+
+**习题课写作规范**：`#` 后仅写题号/简短标签（如 `# 题1`），题干内容另起一行放在 `#` 下方。注意：`#` 行在习题模式下不渲染（无标题栏），仅用于内部 slide 分页。
+
+## Markdown 转 PDF
+
+当用户要求将 Markdown 转为 PDF 时：
+
+```bash
+bash ~/.claude/scripts/md2pdf.sh "<Markdown文件路径>" [额外 pandoc 参数]
+```
+
+- 输出 PDF 与源文件同目录、同名、`.pdf` 后缀
+- 排版引擎：ElegantNote（ElegantLaTeX），蓝黑配色、pad 尺寸（6×8in）、11pt
+- 支持中文：ctex + XeLaTeX
+- 内置 callout2latex 过滤器：`> [!note]` 等提示框自动转为 LaTeX 环境
+- 常用额外参数：`--top-level-division=chapter`（# 标题映射为 chapter）
+- 若需 A4 纸张，追加 `--metadata=classoption:"[cn,11pt,normal]"`
+- 若需 end-to-end 调试，可先输出 .tex：`pandoc xxx.md --defaults=elegantnote --lua-filter=callout2latex -t latex -o xxx.tex`
 SNIPPET
 )
 
