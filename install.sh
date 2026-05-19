@@ -24,6 +24,18 @@ if [ -z "$PANDOC_DIR" ]; then
 fi
 echo "[*] Pandoc data dir: $PANDOC_DIR"
 
+# --- Verify TeX Live / ElegantLaTeX is installed ---
+if ! kpsewhich elegantnote.cls > /dev/null 2>&1; then
+  echo "WARNING: ElegantNote not found. TeX Live (full) may not be installed."
+  echo "  Install TeX Live: https://tug.org/texlive/"
+  echo "  The article pipeline (md2pdf) requires it; the slides pipeline (md2slides) needs Beamer."
+  echo "  Continue anyway? (y/N)"
+  read -r yn
+  case "$yn" in [Yy]*) ;; *) exit 1;; esac
+else
+  echo "[*] TeX Live with ElegantLaTeX detected"
+fi
+
 # --- Detect CJK fonts ---
 CJK_MAIN=""
 CJK_SANS=""
