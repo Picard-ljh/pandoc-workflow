@@ -123,6 +123,14 @@ echo "[*] Installing verify-slides.py..."
 cp "scripts/verify-slides.py" "${SCRIPTS_DIR}/verify-slides.py"
 chmod +x "${SCRIPTS_DIR}/verify-slides.py"
 
+# --- Check Python dependencies for verify-slides.py ---
+if ! python3 -c "import fitz" 2>/dev/null; then
+  echo ""
+  echo "⚠  WARNING: pymupdf not found — verify-slides.py will not work."
+  echo "   Install: pip install pymupdf"
+  echo "   (verify-slides.py checks for vbox overflow, block coverage, etc.)"
+fi
+
 # --- Copy rules ---
 echo "[*] Installing rules..."
 mkdir -p "${CLAUDE_DIR}/rules"
