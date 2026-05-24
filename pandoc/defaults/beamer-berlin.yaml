@@ -2,6 +2,7 @@ pdf-engine: xelatex
 to: beamer
 include-in-header:
   - __PANDOC_DIR__/defaults/beamer-color.tex
+  - __PANDOC_DIR__/defaults/beamer-footline.tex
 metadata:
   theme: Berlin
   colortheme: whale
