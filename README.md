@@ -223,6 +223,35 @@ bash ~/.claude/scripts/md2slides.sh problems.md --defaults=beamer-metropolis-exe
 
 ---
 
+## 幻灯片写作约束
+
+制作 Beamer 幻灯片时，请遵守以下规则以避免内容溢出和排版问题：
+
+- **每页 block ≤ 2 个**：`### 标题` 或 `::: {.alertblock}` 算 1 个 block，超过 2 个极易挤到底部之外
+- **每页正文 ≤ 14 行**：以 10.6pt 中文为基准，带公式的页要更少
+- **公式独占行**：用 `$$...$$`，不要把长公式塞进正文段落
+- **封面用 YAML front matter**：不要用 `##` 写封面信息
+- **致谢页居中**：用 `\begin{center}...\end{center}` 包裹（`\centering` 对多段落无效）
+
+编译后 `verify-slides.py` 会自动检查这些约束，不符合时会报 warning 或 fatal。
+
+---
+
+## 自动验证（verify-slides.py）
+
+编译完成后，`md2slides.sh` 会自动运行 `verify-slides.py` 进行质量检查：
+
+| 检查项 | 说明 | 级别 |
+|--------|------|------|
+| vbox overflow | 内容超出帧底边界 | >15pt 为 FATAL，必须修复 |
+| block 覆盖率 | 每页 block 数量 | >2 个发出 WARNING |
+| 图片溢出 | 图片超出页面边界 | FATAL |
+| 内容溢出 | 文字超出底部边界 | >15pt 为 FATAL |
+
+所有检查通过后才算编译成功。FATAL 级别的检查不通过会阻止输出，必须在 Markdown 中修复后重新编译。
+
+---
+
 ## 提示框大全
 
 你在 Markdown 里写在 `>` 后面的 `[!类型]`，会在 PDF 里变成对应的样式：
@@ -413,7 +442,11 @@ pandoc-workflow/
 │       └── blanks.lua                 ← 填空横线转换（___ → 下划线）
 └── scripts/
     ├── md2pdf.sh                      ← 一键出文章 PDF
-    └── md2slides.sh                   ← 一键出幻灯片 PDF
+    ├── md2slides.sh                   ← 一键出幻灯片 PDF
+    └── verify-slides.py               ← 编译后质量检查
+├── rules/
+│   ├── beamer-guide.md                ← Beamer 写作参考
+│   └── mineru-reference.md            ← MinerU 文档解析参考
 ```
 
 ---

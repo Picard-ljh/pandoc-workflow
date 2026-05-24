@@ -46,11 +46,8 @@ BASE=$(basename "$input")
 
 # Check for raw LaTeX environments inside callout blocks
 if grep -n '^> \[!.*\] *$' "$BASE" > /dev/null 2>&1; then
-  # Extract line numbers of callout starts
   callout_lines=$(grep -n '^> \[!.*\] *$' "$BASE" | cut -d: -f1)
   for cl in $callout_lines; do
-    # Search forward from callout line for \begin{...} within the same blockquote.
-    # A blockquote ends with a blank line, a non-> line, or EOF.
     total=$(wc -l < "$BASE")
     block_end=$(tail -n +"$cl" "$BASE" \
       | awk '/^$/ || (!/^>/ && NR>1) {print NR-1; exit}')
@@ -115,27 +112,54 @@ fi
 # ── Post-compilation checks ─────────────────────────────────────────
 
 logfile="${BASE%.*}.log"
-if [ -f "$logfile" ]; then
-  if grep -q "Overfull \\\\vbox" "$logfile" 2>/dev/null; then
-    echo "⚠  WARNING: Content overflow detected (Overfull \\vbox)."
-    echo "   Some slides have content exceeding the frame height."
-    echo "   Consider reducing \\vspace or splitting the slide."
-    echo ""
-    grep -n "Overfull \\\\vbox" "$logfile" | head -5
-    echo ""
-  fi
-fi
 
 # Check for undefined references or citations
-if grep -q "LaTeX Warning:.*undefined" "$logfile" 2>/dev/null; then
+if [ -f "$logfile" ] && grep -q "LaTeX Warning:.*undefined" "$logfile" 2>/dev/null; then
   echo "⚠  WARNING: Undefined references detected."
   grep -n "LaTeX Warning:.*undefined" "$logfile" | head -3
   echo ""
 fi
 
-# Clean up auxiliary files (keep .pdf and .md only)
-rm -f "${BASE%.*}".aux "${BASE%.*}".log "${BASE%.*}".out \
+# Check .tex for common cover page mistakes (before cleanup deletes it)
+if [ -f "$texfile" ]; then
+  # Check 1: Cover split — consecutive \begin{frame} with personal info as titles
+  if grep -qE '\\begin\{frame\}\{(答辩人|指导教|姓名|学号|学院|日期|20[0-9]{2})' "$texfile" 2>/dev/null; then
+    echo "⚠  WARNING: Cover page may be split into multiple slides."
+    echo "   Detected \\begin{frame} with personal info as frame title."
+    echo "   Solution: Use YAML front matter (title:/author:/date:) instead of ## headers."
+    echo ""
+  fi
+  # Check 2: Escaped LaTeX — patterns that indicate YAML field escaping
+  YAML_ESCAPE=0
+  if grep -q '\\textbackslash' "$texfile" 2>/dev/null; then
+    YAML_ESCAPE=1
+  fi
+  if grep -qE '\{\[\}[0-9]' "$texfile" 2>/dev/null; then
+    YAML_ESCAPE=1
+  fi
+  if [ "$YAML_ESCAPE" -eq 1 ]; then
+    echo "⚠  WARNING: LaTeX commands appear escaped in YAML fields."
+    echo "   This can cause raw text like [2pt] or {} to appear on the cover."
+    echo "   Solution: Use YAML literal block (|) with \\ at end of line for line breaks."
+    echo ""
+  fi
+fi
+
+# Clean up auxiliary files (keep .pdf, .md, and .log for verification)
+rm -f "${BASE%.*}".aux "${BASE%.*}".out \
       "${BASE%.*}".nav "${BASE%.*}".snm "${BASE%.*}".toc \
       "${BASE%.*}".vrb "$texfile"
+
+# ── Post-compilation verification ──────────────────────────────
+VERIFY_SCRIPT="${HOME}/.claude/scripts/verify-slides.py"
+if command -v python3 &> /dev/null && [ -f "$VERIFY_SCRIPT" ] && [ -f "$output" ]; then
+  verify_result=0
+  python3 "$VERIFY_SCRIPT" "$output" "$input" --defaults "$DEFAULTS" || verify_result=$?
+  if [ $verify_result -eq 2 ]; then
+    echo ""
+    echo "❌ FATAL: Verification found critical issues. Fix before proceeding."
+    exit 1
+  fi
+fi
 
 echo "Done: $output"
