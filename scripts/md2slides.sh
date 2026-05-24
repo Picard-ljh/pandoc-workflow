@@ -45,9 +45,12 @@ BASE=$(basename "$input")
 # ── Pre-flight checks ──────────────────────────────────────────────
 
 # Check for raw LaTeX environments inside callout blocks
-if grep -n '^> \[!.*\] *$' "$BASE" > /dev/null 2>&1; then
-  callout_lines=$(grep -n '^> \[!.*\] *$' "$BASE" | cut -d: -f1)
+if grep -nE '^> \[!\w+\]' "$BASE" > /dev/null 2>&1; then
+  # Extract line numbers of callout starts (with or without inline title)
+  callout_lines=$(grep -nE '^> \[!\w+\]' "$BASE" | cut -d: -f1)
   for cl in $callout_lines; do
+    # Search forward from callout line for \begin{...} within the same blockquote.
+    # A blockquote ends with a blank line, a non-> line, or EOF.
     total=$(wc -l < "$BASE")
     block_end=$(tail -n +"$cl" "$BASE" \
       | awk '/^$/ || (!/^>/ && NR>1) {print NR-1; exit}')
@@ -70,14 +73,59 @@ awk '
       printf "⚠  WARNING: Slide \"%s\" has %.1fcm total \\vspace (threshold: %.1fcm)\n", slide, total, threshold
     slide = $0; sub(/^## /, "", slide); total = 0
   }
-  /\\vspace\{[0-9.]+cm\}/ {
-    s = $0; sub(/.*\\vspace\{/, "", s); sub(/cm\}.*/, "", s); total += s + 0
+  {
+    line = $0
+    while (match(line, /\\vspace\{[0-9.]+cm\}/)) {
+      m = substr(line, RSTART, RLENGTH)
+      v = m; sub(/\\vspace\{/, "", v); sub(/cm\}/, "", v)
+      total += v + 0
+      line = substr(line, RSTART + RLENGTH)
+    }
   }
   END {
     if (slide != "" && total > threshold)
       printf "⚠  WARNING: Slide \"%s\" has %.1fcm total \\vspace (threshold: %.1fcm)\n", slide, total, threshold
   }
 ' threshold=2.5 "$BASE"
+
+# Check slide density (blocks, display formulas, text lines per slide)
+# Warns on slides likely to overflow — based on empirical overflow data
+awk '
+  /^## / {
+    if (slide != "" && (blocks > 2 || formulas >= 2 || lines >= 8))
+      printf "⚠  WARNING: Slide \"%s\" may overflow — %d block(s) + %d formula(s) + %d line(s)\n", slide, blocks, formulas, lines
+    slide = $0; sub(/^## /, "", slide); blocks = 0; formulas = 0; lines = 0
+    next
+  }
+  /^### / { blocks++; lines++; next }
+  /^::: \{/ { blocks++; lines++; next }
+  /^\$\$/  { in_formula = !in_formula; if (in_formula) formulas++; next }
+  /^[^#\s]/ { lines++ }
+  END {
+    if (slide != "" && (blocks > 2 || formulas >= 2 || lines >= 8))
+      printf "⚠  WARNING: Slide \"%s\" may overflow — %d block(s) + %d formula(s) + %d line(s)\n", slide, blocks, formulas, lines
+  }
+' "$BASE"
+
+# Check if cover page uses ## headers (slide-level:2 makes each a separate slide)
+# Only scan first 5 ## lines; cover is always at top of file
+cover_hits=$(grep -m 5 '^## ' "$BASE" | grep -cE '(答辩人|指导教|学号|姓名)' || true)
+if [ "$cover_hits" -ge 2 ]; then
+  echo "❌ FATAL: Cover page split detected — $cover_hits ## headers in first 5 slides"
+  echo "   look like personal info. Each will become a separate blank slide."
+  echo "   Solution: replace with YAML front matter:"
+  echo ""
+  echo "   ---"
+  echo "   title: 论文题目"
+  echo "   subtitle: 学校 · 学院"
+  echo "   author: |"
+  echo "     答辩人：XXX\\"
+  echo "     指导教师：XXX"
+  echo "   date: 2026 年 5 月"
+  echo "   ---"
+  echo ""
+  exit 1
+fi
 
 # ── Compilation: Markdown → LaTeX → PDF ─────────────────────────────
 
@@ -110,9 +158,9 @@ if [ ! -f "${BASE%.*}.pdf" ]; then
 fi
 
 # ── Post-compilation checks ─────────────────────────────────────────
+# Note: vbox overflow check moved to verify-slides.py (with 2/15pt thresholds)
 
 logfile="${BASE%.*}.log"
-
 # Check for undefined references or citations
 if [ -f "$logfile" ] && grep -q "LaTeX Warning:.*undefined" "$logfile" 2>/dev/null; then
   echo "⚠  WARNING: Undefined references detected."
@@ -122,14 +170,14 @@ fi
 
 # Check .tex for common cover page mistakes (before cleanup deletes it)
 if [ -f "$texfile" ]; then
-  # Check 1: Cover split — consecutive \begin{frame} with personal info as titles
+  # Check 1: Cover split — consecutive \begin{frame}{...} with personal info as titles
   if grep -qE '\\begin\{frame\}\{(答辩人|指导教|姓名|学号|学院|日期|20[0-9]{2})' "$texfile" 2>/dev/null; then
     echo "⚠  WARNING: Cover page may be split into multiple slides."
     echo "   Detected \\begin{frame} with personal info as frame title."
     echo "   Solution: Use YAML front matter (title:/author:/date:) instead of ## headers."
     echo ""
   fi
-  # Check 2: Escaped LaTeX — patterns that indicate YAML field escaping
+  # Check 2: Escaped LaTeX — two patterns that indicate YAML field escaping
   YAML_ESCAPE=0
   if grep -q '\\textbackslash' "$texfile" 2>/dev/null; then
     YAML_ESCAPE=1
@@ -145,7 +193,7 @@ if [ -f "$texfile" ]; then
   fi
 fi
 
-# Clean up auxiliary files (keep .pdf, .md, and .log for verification)
+# Clean up auxiliary files (keep .pdf and .md only; .log kept for verify-slides.py)
 rm -f "${BASE%.*}".aux "${BASE%.*}".out \
       "${BASE%.*}".nav "${BASE%.*}".snm "${BASE%.*}".toc \
       "${BASE%.*}".vrb "$texfile"
