@@ -335,13 +335,20 @@ def check_visual(pdf_path: Path, theme: str = "madrid") -> tuple[int, int, list[
                 lines_in_block = text.split("\n")
                 if all(FOOTER_RE.match(l.strip()) or len(l.strip()) == 0 for l in lines_in_block):
                     continue
-                fatals += 1
                 overflow = b[3] - page_bottom
                 text_preview = text[:60]
-                lines.append(
-                    f"  {red('FATAL')} Page {i+1}: content extends {overflow:.0f}pt "
-                    f"past bottom: \"{text_preview}...\""
-                )
+                if overflow > 15:
+                    fatals += 1
+                    lines.append(
+                        f"  {red('FATAL')} Page {i+1}: content extends {overflow:.0f}pt "
+                        f"past bottom (>15pt): \"{text_preview}...\""
+                    )
+                elif overflow >= 2:
+                    warnings += 1
+                    lines.append(
+                        f"  {yellow('WARN')} Page {i+1}: content extends {overflow:.0f}pt "
+                        f"past bottom (2–15pt): \"{text_preview}...\""
+                    )
 
     doc.close()
     return warnings, fatals, lines
