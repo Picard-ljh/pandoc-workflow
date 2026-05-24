@@ -323,7 +323,7 @@ bash ~/.claude/scripts/md2pdf.sh article.md --metadata=classoption:"[cn,11pt,pad
 
 ```bash
 # 生成 .tex 中间文件（调试用）
-pandoc article.md --defaults=elegantnote --lua-filter=callout2latex -s -t latex -o article.tex
+pandoc article.md --defaults=elegantnote --lua-filter=callout2latex --lua-filter=blanks -s -t latex -o article.tex
 ```
 
 ---
@@ -343,10 +343,10 @@ pandoc article.md --defaults=elegantnote --lua-filter=callout2latex -s -t latex 
         │
         ▼
     Lua 过滤器
-    ├── callout2latex.lua（文章线）
-    │   把 [!type] 变成 \begin{note}...\end{note}
-    └── callout2beamer.lua（幻灯片线）
-        把 [!type] 变成 \begin{block}...\end{block}
+    ├── callout2latex.lua（文章线） + blanks.lua（填空横线）
+    │   把 [!type] 变成 \begin{note}...\end{note}，___ 变成下划线
+    └── callout2beamer.lua（幻灯片线） + blanks.lua
+        把 [!type] 变成 \begin{block}...\end{block}，___ 变成下划线
         │
         ▼
     LaTeX 排版引擎

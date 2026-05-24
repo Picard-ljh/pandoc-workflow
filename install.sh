@@ -145,46 +145,17 @@ CLAUDE_SNIPPET=$(cat <<'SNIPPET'
 bash ~/.claude/scripts/md2slides.sh "<Markdown文件路径>" [额外 pandoc 参数]
 ```
 
-排版引擎：Beamer + XeLaTeX，16:9 横屏，whale 标准配色。中文：SimSun + SimHei。
+排版引擎：Beamer + XeLaTeX，16:9 横屏，whale 标准配色。
 
-### 标题结构（`slide-level: 2`）
+三种主题（生成前必须询问用户，默认 Madrid）：
+- Madrid：`--defaults=beamer`
+- Berlin：`--defaults=beamer-berlin`
+- metropolis：`--defaults=beamer-metropolis`
+- 习题课模式加 `-exercise` 后缀
 
-| 层级 | Markdown | 是否产生 slide |
-|------|----------|---------------|
-| 1 | `# 章节名` | 否（仅目录 + 导航条） |
-| 2 | `## 页标题` | 是 |
-| 3 | `### 框标题` | 否（Madrid 蓝色内容块） |
+编译后自动运行 verify-slides.py 质检，FATAL 会阻止输出。
 
-- 封面必须用 YAML front matter，禁止用 `##` 写封面
-- 目录页和致谢页需用 `##`，但不需 `###`；致谢页内容需用 `\begin{center}...\end{center}` 包裹以居中显示
-
-### 写作约束
-
-- 每页 block ≤ 2（`###` 标题 或 `:::{.alertblock}` 算 1 个 block）
-- 每页正文 ≤ 14 行（10.6pt 中文基准，带公式行的页要更少）
-- 公式独占行用 `$$...$$`，勿内嵌正文
-- 图片用 raw LaTeX：`\begin{center}\includegraphics[width=0.55\textwidth,height=0.30\textheight,keepaspectratio]{path}\end{center}`
-
-### 编译后自动验证
-
-`md2slides.sh` 编译完成后会自动调用 `verify-slides.py` 检查：
-- vbox 溢出（>15pt 为 fatal，必须修复）
-- block 覆盖率（>2 blocks 的 slide 发出警告）
-- 图片放置是否正确
-
-验证不通过（fatal）时会阻止输出，必须修复后重新编译。
-
-### 三种主题（生成前必须询问用户，默认 Madrid）
-
-| 主题 | `{theme}` 值 | 风格 |
-|------|-------------|------|
-| Madrid（默认） | `beamer` | 顶部导航条 + 底部信息栏，经典学术风 |
-| Berlin | `beamer-berlin` | 顶部横条 + 底部页脚 |
-| metropolis 极简 | `beamer-metropolis` | 无横条，仅细线分隔 |
-
-习题课模式加 `-exercise` 后缀（8pt 小字，无标题栏）。
-
-> 详细的标题结构、彩色框语法、习题课写作规范 → `~/.claude/rules/beamer-guide.md`
+> 标题结构、写作约束（block ≤ 2、公式、图片规范）、彩色框语法 → `~/.claude/rules/beamer-guide.md`
 
 ## Markdown 转 PDF
 
@@ -192,11 +163,9 @@ bash ~/.claude/scripts/md2slides.sh "<Markdown文件路径>" [额外 pandoc 参�
 bash ~/.claude/scripts/md2pdf.sh "<Markdown文件路径>" [额外 pandoc 参数]
 ```
 
-- 输出 PDF 与源文件同目录、同名、`.pdf` 后缀
 - 排版引擎：ElegantNote（ElegantLaTeX），蓝黑配色、pad 尺寸（6×8in）、11pt
-- 支持中文：ctex + XeLaTeX，内置 callout2latex 过滤器
-- 常用额外参数：`--top-level-division=chapter`（# 标题映射为 chapter）
-- 若需 A4 纸张，追加 `--metadata=classoption:"[cn,11pt,normal]"`
+- 支持中文：ctex + XeLaTeX，内置 callout2latex + blanks 过滤器
+- 若需 A4：追加 `--metadata=classoption:"[cn,11pt,normal]"`
 SNIPPET
 )
 
