@@ -61,10 +61,10 @@ def check_vbox(pdf_path: Path) -> tuple[int, int, list[str]]:
         if pts > 15:
             fatals += 1
             lines.append(f"  {red('FATAL')} line {line_no}: {pts:.1f}pt overflow (>15pt)")
-        elif pts >= 5:
+        elif pts >= 2:
             warnings += 1
-            lines.append(f"  {yellow('WARN')} line {line_no}: {pts:.1f}pt overflow (5–15pt)")
-        # <5pt silently ignored
+            lines.append(f"  {yellow('WARN')} line {line_no}: {pts:.1f}pt overflow (2–15pt)")
+        # <2pt silently ignored
 
     return warnings, fatals, lines
 
