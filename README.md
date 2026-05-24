@@ -127,7 +127,7 @@ bash ~/.claude/scripts/md2pdf.sh 我的文章.md
 
 ### 做一份学术答辩 PPT
 
-1. 写一个 Markdown 文件，每个 `#` 标题就是一帧幻灯片：
+1. 写一个 Markdown 文件，每个 `##` 标题就是一帧幻灯片（`#` 是章节导航，不产生页面）：
 
 ```markdown
 ---
@@ -137,7 +137,7 @@ author: 我的名字
 date: 2026年5月
 ---
 
-# 研究背景
+## 研究背景
 
 - 背景要点一
 - 背景要点二
@@ -146,7 +146,7 @@ date: 2026年5月
 > [!note] 行业现状
 > 补充说明信息。
 
-# 主要贡献
+## 主要贡献
 
 1. 贡献一
 2. 贡献二
@@ -155,7 +155,7 @@ date: 2026年5月
 > [!warning] 注意事项
 > 这里有需要注意的约束条件。
 
-# 总结
+## 总结
 
 - 总结要点一
 - 总结要点二
@@ -181,8 +181,8 @@ bash ~/.claude/scripts/md2slides.sh 我的答辩.md
 - 经典学术风，适合答辩和正式报告
 
 **Berlin**
-- 顶部横条 + 底部页脚
-- 与 Madrid 同属 infolines 家族，章节导航更突出
+- 顶部横条 + 底部页脚（页码 N/M，与 Madrid 相同）
+- 深蓝配色（自定义 navyblue #003366），章节导航突出
 - 适合结构比较复杂的演讲
 
 **metropolis 极简**
@@ -243,10 +243,10 @@ bash ~/.claude/scripts/md2slides.sh problems.md --defaults=beamer-metropolis-exe
 
 | 检查项 | 说明 | 级别 |
 |--------|------|------|
-| vbox overflow | 内容超出帧底边界 | >15pt 为 FATAL，必须修复 |
+| vbox overflow | 内容超出帧底边界 | >15pt FATAL / 2–15pt WARNING / <2pt 忽略 |
 | block 覆盖率 | 每页 block 数量 | >2 个发出 WARNING |
 | 图片溢出 | 图片超出页面边界 | FATAL |
-| 内容溢出 | 文字超出底部边界 | >15pt 为 FATAL |
+| 内容溢出 | 文字超出底部边界 | >15pt FATAL / 2–15pt WARNING / <2pt 忽略 |
 
 所有检查通过后才算编译成功。FATAL 级别的检查不通过会阻止输出，必须在 Markdown 中修复后重新编译。
 
@@ -435,7 +435,7 @@ pandoc-workflow/
 │   │   ├── beamer-metropolis-exercise.yaml ← metropolis + 习题排版
 │   │   ├── beamer-color.tex           ← Berlin 自定义深蓝配色
 │   │   ├── beamer-exercise-style.tex  ← 习题排版样式（小字 + 紧贴）
-│   │   └── beamer-footline.tex        ← Madrid 精简页脚（N/M 页码）
+│   │   └── beamer-footline.tex        ← Madrid + Berlin 精简页脚（N/M 页码）
 │   └── filters/
 │       ├── callout2latex.lua          ← 文章线提示框转换
 │       ├── callout2beamer.lua         ← 幻灯片线提示框转换
