@@ -39,6 +39,14 @@ for arg in "$@"; do
   fi
 done
 
+# Exercise mode: slide-level 1 (# = slide), auto-wrap body in block{}
+EXERCISE_FILTER=""
+SLIDE_PTRN="^## "
+if [[ "$DEFAULTS" == *exercise* ]]; then
+  EXERCISE_FILTER="--lua-filter=$PANDOC_DATA_DIR/filters/exercise-block.lua"
+  SLIDE_PTRN="^# "
+fi
+
 cd "$(dirname "$input")"
 BASE=$(basename "$input")
 
@@ -67,11 +75,11 @@ fi
 
 # Check for excessive \vspace per slide (prevents content overflow)
 # Frame available height ≈ 13cm for Madrid 16:9 11pt; \vspace sum > 2.5cm is risky
-awk '
-  /^## / {
+awk -v ptrn="$SLIDE_PTRN" '
+  $0 ~ ptrn {
     if (slide != "" && total > threshold)
       printf "⚠  WARNING: Slide \"%s\" has %.1fcm total \\vspace (threshold: %.1fcm)\n", slide, total, threshold
-    slide = $0; sub(/^## /, "", slide); total = 0
+    slide = $0; sub(ptrn, "", slide); total = 0
   }
   {
     line = $0
@@ -90,11 +98,11 @@ awk '
 
 # Check slide density (blocks, display formulas, text lines per slide)
 # Warns on slides likely to overflow — based on empirical overflow data
-awk '
-  /^## / {
+awk -v ptrn="$SLIDE_PTRN" '
+  $0 ~ ptrn {
     if (slide != "" && (blocks > 2 || formulas >= 2 || lines >= 8))
       printf "⚠  WARNING: Slide \"%s\" may overflow — %d block(s) + %d formula(s) + %d line(s)\n", slide, blocks, formulas, lines
-    slide = $0; sub(/^## /, "", slide); blocks = 0; formulas = 0; lines = 0
+    slide = $0; sub(ptrn, "", slide); blocks = 0; formulas = 0; lines = 0
     next
   }
   /^### / { blocks++; lines++; next }
@@ -138,6 +146,7 @@ sed 's/___/\\\\_\\\\_\\\\_/g' "$BASE" \
   --defaults="$DEFAULTS" \
   --lua-filter="$PANDOC_DATA_DIR/filters/blanks.lua" \
   --lua-filter="$PANDOC_DATA_DIR/filters/callout2beamer.lua" \
+  $EXERCISE_FILTER \
   -o "$texfile" \
   "${EXTRA[@]}"
 

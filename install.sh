@@ -111,6 +111,7 @@ echo "[*] Installing Lua filters..."
 cp "pandoc/filters/callout2latex.lua"  "${PANDOC_DIR}/filters/callout2latex.lua"
 cp "pandoc/filters/callout2beamer.lua" "${PANDOC_DIR}/filters/callout2beamer.lua"
 cp "pandoc/filters/blanks.lua"         "${PANDOC_DIR}/filters/blanks.lua"
+cp "pandoc/filters/exercise-block.lua" "${PANDOC_DIR}/filters/exercise-block.lua"
 
 # --- Copy scripts ---
 echo "[*] Installing scripts..."

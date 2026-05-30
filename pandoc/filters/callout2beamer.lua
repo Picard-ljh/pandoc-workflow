@@ -49,11 +49,12 @@ local function handle_list(list)
       "\\item " .. pandoc.write(pandoc.Pandoc(item), "latex"))
   end
   table.insert(result, "\\end{" .. env .. "}")
-  return table.concat(result, "\\n")
+  return table.concat(result, "\n")
 end
 
 function BlockQuote(el)
-  if #el.content < 1 or el.content[1].t ~= 'Para' then
+  local first = el.content[1]
+  if not first or (first.t ~= 'Para' and first.t ~= 'Plain') then
     return el
   end
 
@@ -63,16 +64,27 @@ function BlockQuote(el)
   end
 
   local marker_idx = nil
+  local marker_rest = nil
   for i, inline in ipairs(first_para) do
-    if inline.t == 'Str' and inline.text:match('^%[!%w+%]$') then
-      marker_idx = i
-      break
+    if inline.t == 'Str' then
+      local rest = inline.text:match('^%[!%w+%](.*)$')
+      if rest then
+        marker_idx = i
+        marker_rest = rest
+        break
+      end
     end
   end
   if not marker_idx then return el end
 
   local callout_type = first_para[marker_idx].text:match('%[!(%w+)%]')
   if not callout_type then return el end
+
+  -- If marker Str has trailing text (e.g. "[!note]Title"), keep it as title
+  if marker_rest ~= '' then
+    first_para[marker_idx] = pandoc.Str(marker_rest)
+    marker_idx = marker_idx - 1
+  end
 
   local content_start_idx = nil
   for i = marker_idx + 1, #first_para do

@@ -1,9 +1,12 @@
 pdf-engine: xelatex
 to: beamer
+slide-level: 2
 metadata:
   theme: Madrid
   colortheme: whale
   fontsize: 11pt
+  classoption:
+    - t
   CJKmainfont: __CJK_MAIN__
   CJKsansfont: __CJK_SANS__
   CJKmonofont: __CJK_SANS__

@@ -8,7 +8,9 @@ bash ~/.claude/scripts/md2slides.sh "<Markdown文件路径>" [额外 pandoc 参�
 
 排版引擎：Beamer + XeLaTeX，16:9 横屏，whale 标准配色。中文：SimSun + SimHei。
 
-## 标题结构规范（`slide-level: 2` 已全局固化）
+## 标题结构规范
+
+**标准模式**（`slide-level: 2`）：
 
 | 层级 | Markdown | Beamer 映射 | 是否产生 slide 页 | 职责 |
 |------|----------|------------|-------------------|------|
@@ -17,6 +19,13 @@ bash ~/.claude/scripts/md2slides.sh "<Markdown文件路径>" [额外 pandoc 参�
 | 3 | `### 框标题` | `\begin{block}{}` | 否（依附于 `##`） | Madrid 蓝色内容框（默认方案） |
 
 - `##` 才产生页面，`#` 不会——**裸 `#` 下面无内容时，pandoc 只写一行 `\section{}`，不生成页面，不报错，直接跳过。** 有内容时 pandoc 可能自动补帧，但不可依赖。
+
+**习题课模式**（`slide-level: 1`，见下方习题课章节）：
+
+| 层级 | Markdown | Beamer 映射 | 是否产生 slide 页 | 职责 |
+|------|----------|------------|-------------------|------|
+| 1 | `#` | `\begin{frame}{}` | ✅ 是 | 每页一个 slide（无标题栏） |
+| 2 | `## 框标题` | `\begin{block}{}` | 否（依附于 `#`） | Madrid 蓝色内容框 |
 - 目录页和致谢页同样需要用 `##`，只是不需要 `###`；致谢页内容需用 `\begin{center}...\end{center}` 包裹以居中显示（`\centering` 在 pandoc Markdown 中对多段落无效）
 - Section 分隔页已全局禁用
 
@@ -70,7 +79,30 @@ callout2beamer.lua 过滤器中，以下 fenced div 渲染为不同颜色的 Mad
 
 ## 习题课
 
-`#` 后仅写题号/简短标签（如 `# 题1`），题干内容另起一行放在 `#` 下方。`#` 行在习题模式下不渲染（无标题栏），仅用于内部 slide 分页。
+习题课模式使用 `slide-level: 1`，`#` 即为 slide 分页符。`exercise-block.lua` 过滤器自动将每页内容包裹在 Madrid 蓝色 `block{}` 中，无需手写 raw LaTeX。
+
+写法：
+
+```markdown
+#
+
+已知函数 $f(x) = |\sin x| + |\cos x|$，则
+
+A. 选项一
+
+B. 选项二
+
+#
+
+已知函数 $f(x) = 2\sin x - \sin 2x$，则
+
+A. 选项一
+```
+
+- `#` 后不写内容（仅分页），或写简短标签（不渲染）
+- 每页正文自动包裹 Madrid 蓝色框
+- 题干和选项同级，均为正文
+- 无封面、无致谢、无标题栏、8pt 紧凑排版
 
 ## Markdown 转 PDF
 
@@ -88,7 +120,7 @@ bash ~/.claude/scripts/md2pdf.sh "<Markdown文件路径>" [额外 pandoc 参数]
 ## PDF 转 PPT
 
 ```bash
-node C:\Users\22972\.claude\scripts\pdf2pptx.js "<PDF路径>" --output "<输出路径>"
+node ~/.claude/scripts/pdf2pptx.js "<PDF路径>" --output "<输出路径>"
 ```
 
 - 需 Node.js 环境，默认 300 DPI（`--dpi` 可调）

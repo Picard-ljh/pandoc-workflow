@@ -345,8 +345,10 @@ pandoc article.md --defaults=elegantnote --lua-filter=callout2latex --lua-filter
     Lua 过滤器
     ├── callout2latex.lua（文章线） + blanks.lua（填空横线）
     │   把 [!type] 变成 \begin{note}...\end{note}，___ 变成下划线
-    └── callout2beamer.lua（幻灯片线） + blanks.lua
-        把 [!type] 变成 \begin{block}...\end{block}，___ 变成下划线
+    ├── callout2beamer.lua（幻灯片线） + blanks.lua
+    │   把 [!type] 变成 \begin{block}...\end{block}，___ 变成下划线
+    └── exercise-block.lua（习题课模式）
+        把 # 分页之间的内容自动包裹在 \begin{block}{}...\end{block} 中
         │
         ▼
     LaTeX 排版引擎
@@ -439,6 +441,7 @@ pandoc-workflow/
 │   └── filters/
 │       ├── callout2latex.lua          ← 文章线提示框转换
 │       ├── callout2beamer.lua         ← 幻灯片线提示框转换
+│       ├── exercise-block.lua         ← 习题课自动包裹 block
 │       └── blanks.lua                 ← 填空横线转换（___ → 下划线）
 └── scripts/
     ├── md2pdf.sh                      ← 一键出文章 PDF
