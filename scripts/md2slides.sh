@@ -44,7 +44,7 @@ EXERCISE_FILTER=""
 SLIDE_PTRN="^## "
 if [[ "$DEFAULTS" == *exercise* ]]; then
   EXERCISE_FILTER="--lua-filter=$PANDOC_DATA_DIR/filters/exercise-block.lua"
-  SLIDE_PTRN="^# "
+  SLIDE_PTRN="^#[[:space:]]?"
 fi
 
 cd "$(dirname "$input")"

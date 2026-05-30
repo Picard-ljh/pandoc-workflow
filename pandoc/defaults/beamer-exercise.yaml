@@ -1,5 +1,6 @@
 pdf-engine: xelatex
 to: beamer
+slide-level: 1
 include-in-header:
   - __PANDOC_DIR__/defaults/beamer-exercise-style.tex
 metadata:

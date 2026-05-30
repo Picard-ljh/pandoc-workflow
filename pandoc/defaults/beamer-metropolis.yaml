@@ -1,5 +1,6 @@
 pdf-engine: xelatex
 to: beamer
+slide-level: 2
 metadata:
   theme: metropolis
   colortheme: metropolis

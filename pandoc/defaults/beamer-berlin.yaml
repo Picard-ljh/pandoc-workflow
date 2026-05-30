@@ -1,5 +1,6 @@
 pdf-engine: xelatex
 to: beamer
+slide-level: 2
 include-in-header:
   - __PANDOC_DIR__/defaults/beamer-color.tex
   - __PANDOC_DIR__/defaults/beamer-footline.tex
